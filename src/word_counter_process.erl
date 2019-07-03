@@ -11,7 +11,7 @@ count_words(FileName) ->
   {ok, Content} = file:read_file(FileName),
   Lines = string:split(Content, "\n", all),
   Words = split_in_words(Lines, []),
-  count(Words, maps:new()).
+  count(Words).
 
 split_in_words([], Acc) -> lists:flatten(Acc);
 
@@ -19,18 +19,16 @@ split_in_words([Line | Lines], Acc) ->
   Words = string:split(string:trim(Line, both), " ", all),
   split_in_words(Lines, [Words | Acc]).
 
-count([], Counter) -> Counter;
+count([]) -> ok;
 
-count([Word | Words], Counter) ->
-  Counter_Fun = fun(V) -> V + 1 end,
-
+count([Word | Words]) ->
   case clean_word(Word) of
     no_word ->
-      count(Words, Counter);
+      count(Words);
 
     {OneWord, NewWords} ->
-      NewAcc = maps:update_with(OneWord, Counter_Fun, 1, Counter),
-      count(NewWords ++ Words, NewAcc)
+      word_counter_state:update_word(OneWord),
+      count(NewWords ++ Words)
   end.
 
 clean_word(Word) ->

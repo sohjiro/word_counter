@@ -29,7 +29,11 @@ init([]) ->
     SupFlags = #{strategy => one_for_all,
                  intensity => 0,
                  period => 1},
-    ChildSpecs = [],
+    ChildSpecs = [#{id => word_counter_state,
+                    start => {word_counter_state, start_link, []},
+                    restart => permanent,
+                    type => worker,
+                    modules => [word_counter_state]}],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions
